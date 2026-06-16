@@ -1,0 +1,50 @@
+{
+  "name": "Ubuntu",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "moby": false
+    },
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "22",
+      "nodeGypDependencies": false
+    },
+    "ghcr.io/devcontainers/features/python:1": {
+      "version": "3.13"
+    },
+    "ghcr.io/jsburckhardt/devcontainer-features/uv:1.0.0": {},
+    "ghcr.io/devcontainers/features/aws-cli:1": {},
+    "ghcr.io/devcontainers/features/copilot-cli:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/terraform:1": {}
+  },
+  "postCreateCommand": "/bin/sh .devcontainer/postCreateCommand.sh",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "amazonwebservices.aws-toolkit-vscode",
+        "GitHub.copilot",
+        "GitHub.copilot-chat",
+        "ms-python.debugpy",
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-vscode.vscode-typescript-next",
+        "mtxr.sqltools",
+        "mtxr.sqltools-driver-pg",
+        "mtxr.sqltools-driver-mysql",
+        "Devanil.context-organizer",
+        "matklad.rust-analyzer",
+        "vadimcn.vscode-lldb",
+        "fabiospampinato.vscode-todo-plus",
+        "ms-azuretools.vscode-docker"
+      ]
+    },
+    "codespaces": {
+      "repositories": {
+        "tmc-ccoe/*": {
+          "permissions": "write-all"
+        }
+      }
+    }
+  }
+}

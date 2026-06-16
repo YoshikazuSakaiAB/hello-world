@@ -1,0 +1,9 @@
+{
+  "name": "tdd-guard",
+  "version": "1.0.0",
+  "description": "TDD を強制する品質ゲート Plugin。テストなしのコード編集をブロックする。",
+  "author": "あなたの名前",
+  "homepage": "https://github.com/あなたのアカウント/tdd-guard",
+  "hooks": ".claude/settings.json#hooks",
+  "skills": ["tdd-guard/SKILL.md"]
+}

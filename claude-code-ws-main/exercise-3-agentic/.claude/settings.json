@@ -1,0 +1,5 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "_comment": "Step 1 でここを書き換えます。README.md の Step 1 を参照。",
+  "hooks": {}
+}

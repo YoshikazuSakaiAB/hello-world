@@ -1,0 +1,60 @@
+# CI パイプライン雛形（GitHub Actions）
+# 品質ゲート: lint → test → security-check
+# プロジェクトごとに使用するツール・コマンドを差し替えてください。
+
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup runtime
+        # 例: actions/setup-node@v4 / actions/setup-python@v5
+        run: echo "TODO: setup runtime"
+      - name: Install dependencies
+        run: echo "TODO: install (例: pnpm install --frozen-lockfile)"
+      - name: Run linter
+        run: echo "TODO: lint (例: pnpm lint)"
+      - name: Check formatting
+        run: echo "TODO: format check (例: pnpm format:check)"
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup runtime
+        run: echo "TODO: setup runtime"
+      - name: Install dependencies
+        run: echo "TODO: install"
+      - name: Run tests with coverage
+        run: echo "TODO: test (例: pnpm test --coverage)"
+      - name: Upload coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage/
+
+  security-check:
+    name: Security Check
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+      - name: Dependency audit
+        run: echo "TODO: audit (例: pnpm audit / pip-audit)"
+      - name: Secret scanning
+        # 例: gitleaks / trufflehog
+        run: echo "TODO: secret scan"
+      - name: SAST
+        # 例: CodeQL / Semgrep
+        run: echo "TODO: SAST"
