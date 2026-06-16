@@ -1,0 +1,26 @@
+{  
+  "name": "Ubuntu",  
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",  
+  
+  "features": {  
+    "ghcr.io/devcontainers/features/node:1": {  
+      "version": "lts"  
+    }  
+  },  
+  
+  "customizations": {  
+    "vscode": {  
+      "extensions": [  
+        "dbaeumer.vscode-eslint",  
+        "esbenp.prettier-vscode"  
+      ]  
+    },  
+    "codespaces": {  
+      "repositories": {  
+        "tmc-ccoe/*": {  
+          "permissions": "write-all"  
+        }  
+      }  
+    }  
+  }  
+}  
