@@ -19,6 +19,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `exercise-1-vibe` は意図的に **Next.js**（捨てる前提のスタック）。Vibe の「ノリ」を体感するためだけの演習。
 - `exercise-2-sdd` 以降は **Vite + React + TypeScript + Vitest** に固定（`exercise-2-sdd/CLAUDE.md` で宣言）。
 - 各演習ディレクトリには **その演習用の `CLAUDE.md` / `.claude/settings.json` / `.claude-plugin/plugin.json` / Skill 雛形** が既に置かれていることがある。**演習ディレクトリで作業する場合、その配下の `CLAUDE.md` が優先される**（このルートファイルではなく）。
+- coder環境を利用しているため、プレビューは`npm run preview`を用いる
+
 
 ## ハーネス雛形の場所
 

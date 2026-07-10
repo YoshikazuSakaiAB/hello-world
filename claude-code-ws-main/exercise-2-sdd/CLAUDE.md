@@ -39,6 +39,9 @@ specs/
 - 実行コマンド: `npm test -- --run`（Vitest の単発実行）
 - テストファイルの命名: `src/foo/Bar.tsx` → `__tests__/foo/Bar.test.tsx`
 
+# ブラウザ確認
+- coder環境を用いているため、`npm run build`→`npm run preview`を利用してください。
+
 ## やってはいけないこと
 
 - テストファイルを書き換えてテストを通すこと（実装側を直す）
