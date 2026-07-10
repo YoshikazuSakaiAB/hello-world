@@ -4,9 +4,10 @@
 - 複雑なタスクはリサーチ→計画→実装→検証のフェーズを踏まえる
 
 # 技術スタック
-- フロントエンド：Next.js
-- バックエンド：Python
-- データ管理：localStrage
+- 形態：Edgeブラウザ拡張機能
+- フロントエンド：TypeScript + HTML/CSS
+- バックエンド：なし（クライアント完結）
+- データ管理：chrome.storage（または localStorage）
 
 # コーディングルール
 - 関数型のアプローチを優先する
@@ -29,4 +30,6 @@ __tests__/
 specs/
 ```
 # ブラウザ確認
-- coder環境を用いているため、`npm run build`→`npm run preview`を利用してください。
+- coder環境を用いているため、プレビュー画面の動作確認は`npm run build`→`npm run preview`を利用してください。
+- 拡張機能として確認する場合は`npm run build`後、Edgeの拡張機能ページで`dist/`を「展開して読み込み」してください。
+- テストは`npm run test`、型チェックは`npm run typecheck`。

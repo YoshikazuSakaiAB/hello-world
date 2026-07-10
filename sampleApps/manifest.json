@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "Markdown Preview",
+  "version": "0.1.0",
+  "description": "Markdown 形式のファイルをプレビューする Edge 拡張機能（SPEC-001）",
+  "action": {
+    "default_title": "Markdown Preview"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "icons": {}
+}
