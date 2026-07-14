@@ -6,13 +6,20 @@
   --bg-elevated: #2f3549; /* さらに一段明るい面（表ヘッダ等） */
   --fg: #a9b1d6; /* 前景（本文） */
   --fg-muted: #787c99; /* 控えめな文字 */
-  --accent: #7aa2f7; /* 強調・リンク・ボタン */
+  --accent: #7aa2f7; /* 強調・リンク・ボタン（青） */
   --accent-fg: #1a1b26; /* 強調上の文字 */
   --border: #414868; /* 罫線 */
   --danger-bg: #443240; /* エラー背景 */
   --danger-fg: #f7768e; /* エラー文字 */
   --ok-bg: #2c3a34; /* 通知背景 */
   --ok-fg: #9ece6a; /* 通知文字 */
+
+  /* TokyoNight アクセントパレット（プレビュー本文の色付け用） */
+  --accent-heading: #7dcfff; /* 見出し（シアン） */
+  --accent-strong: #ff9e64; /* 太字（オレンジ） */
+  --accent-em: #bb9af7; /* 斜体（紫） */
+  --accent-code: #73daca; /* インラインコード（ティール） */
+  --accent-quote: #bb9af7; /* 引用の縁取り（紫） */
 
   font-family: system-ui, sans-serif;
   line-height: 1.6;
@@ -128,8 +135,34 @@ body {
   margin-top: 1rem;
   color: var(--fg);
 }
+/* SPEC-001-R10: 本文要素にアクセント色を付ける */
+.preview-page__content h1,
+.preview-page__content h2,
+.preview-page__content h3,
+.preview-page__content h4,
+.preview-page__content h5,
+.preview-page__content h6 {
+  color: var(--accent-heading);
+}
+.preview-page__content h1,
+.preview-page__content h2 {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.2em;
+}
+.preview-page__content strong {
+  color: var(--accent-strong);
+}
+.preview-page__content em {
+  color: var(--accent-em);
+}
 .preview-page__content a {
   color: var(--accent);
+}
+.preview-page__content blockquote {
+  margin: 1rem 0;
+  padding: 0.25rem 0 0.25rem 1rem;
+  border-left: 4px solid var(--accent-quote);
+  color: var(--fg-muted);
 }
 .preview-page__content table {
   border-collapse: collapse;
@@ -150,11 +183,15 @@ body {
 }
 .preview-page__content code {
   background: var(--bg-alt);
+  color: var(--accent-code);
   border-radius: 4px;
   padding: 0.1rem 0.3rem;
 }
+/* コードブロック内は行全体を本文色にし、インラインコードのアクセントは持ち込まない */
 .preview-page__content pre code {
   padding: 0;
+  color: var(--fg);
+  background: none;
 }
 /* SPEC-001-R4: Mermaid 図は暗色背景に馴染ませつつ視認性のため中央寄せ */
 .mermaid-diagram {
