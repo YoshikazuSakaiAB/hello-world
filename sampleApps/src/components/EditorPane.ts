@@ -24,9 +24,9 @@ export interface EditorPane {
 }
 
 /**
- * SPEC-001-R3/R7: 編集ペインを生成する。
- * - 編集ボタン押下 → 原文を <textarea> に表示（R3 編集）。
- * - 入力のたびに onPreview で再プレビュー（R3 再プレビュー）。
+ * SPEC-001-R3/R7: 編集ペインを生成する（SPEC-001 v0.8.0 で改訂）。
+ * - 読み込み直後から原文を <textarea> に表示し、最初から編集可能とする（編集ボタンは設けない）。
+ * - 入力のたびに onPreview で再プレビュー（R3 リアルタイム再プレビュー）。
  * - 保存ボタン押下 → UTF-8 でダウンロード（R3 保存）。元と異なる文字コードなら onEncodingChanged で通知（R7）。
  */
 export function createEditorPane(options: EditorPaneOptions): EditorPane {
@@ -36,36 +36,20 @@ export function createEditorPane(options: EditorPaneOptions): EditorPane {
   const element = document.createElement("div");
   element.className = "editor-pane";
 
-  // 編集ボタン（押すと編集欄・保存ボタンを表示する）
-  const editButton = document.createElement("button");
-  editButton.type = "button";
-  editButton.className = "editor-pane__edit-button";
-  editButton.textContent = "編集";
-
-  // 編集欄（既定は非表示）
+  // SPEC-001-R3: 本文の編集欄（読み込み直後から編集可能）
   const textarea = document.createElement("textarea");
   textarea.className = "editor-pane__textarea";
   textarea.value = initialText;
-  textarea.hidden = true;
 
-  // 保存ボタン（既定は非表示）
+  // 保存ボタン（常時表示）
   const saveButton = document.createElement("button");
   saveButton.type = "button";
   saveButton.className = "editor-pane__save-button";
   saveButton.textContent = "保存";
-  saveButton.hidden = true;
 
-  element.append(editButton, textarea, saveButton);
+  element.append(textarea, saveButton);
 
-  // SPEC-001-R3: 編集ボタン → 編集可能状態を表示
-  editButton.addEventListener("click", () => {
-    textarea.hidden = false;
-    saveButton.hidden = false;
-    editButton.hidden = true;
-    textarea.focus();
-  });
-
-  // SPEC-001-R3: 入力のたびに再プレビュー
+  // SPEC-001-R3: 入力のたびにリアルタイム再プレビュー
   textarea.addEventListener("input", () => {
     onPreview(textarea.value);
   });

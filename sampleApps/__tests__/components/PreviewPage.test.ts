@@ -172,15 +172,15 @@ describe("createPreviewPage (SPEC-001-R1/R2/R3/R5/R6/R7/R8/R9)", () => {
     expect(content.querySelector("details.front-matter")).toBeNull();
   });
 
-  // SPEC-001-R3 正常系: 編集ボタン→編集→再プレビューがプレビューに反映される
-  it("re-previews edited content (R3)", async () => {
+  // SPEC-001-R3 正常系: 最初から編集可能な textarea を編集するとリアルタイムで再プレビューされる
+  it("re-previews edited content in real time (R3)", async () => {
     const dropZone = page.element.querySelector(".file-drop-zone") as HTMLElement;
     const content = page.element.querySelector(".preview-page__content")!;
     drop(dropZone, makeFile("note.md", "# 元見出し"));
     await waitFor(() => content.querySelector(".preview-page__body h1") !== null);
 
-    // 編集ボタン → textarea を編集 → input で再プレビュー
-    (page.element.querySelector(".editor-pane__edit-button") as HTMLButtonElement).click();
+    // 編集ボタンは無い。読み込み直後から編集可能な textarea を直接編集 → input で再プレビュー
+    expect(page.element.querySelector(".editor-pane__edit-button")).toBeNull();
     const textarea = page.element.querySelector("textarea") as HTMLTextAreaElement;
     textarea.value = "# 変更後見出し";
     textarea.dispatchEvent(new Event("input"));
