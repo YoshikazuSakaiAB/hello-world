@@ -10,7 +10,8 @@ function ensureInitialized(): void {
   if (initialized) {
     return;
   }
-  mermaid.initialize({ startOnLoad: false, securityLevel: "strict" });
+  // SPEC-001-R10: 画面テーマ（TokyoNight）に合わせ暗色テーマで描画する。
+  mermaid.initialize({ startOnLoad: false, securityLevel: "strict", theme: "dark" });
   initialized = true;
 }
 

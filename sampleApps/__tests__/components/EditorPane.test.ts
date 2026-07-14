@@ -23,18 +23,22 @@ describe("createEditorPane (SPEC-001-R3/R7)", () => {
     vi.restoreAllMocks();
   });
 
-  // SPEC-001-R3 正常系: 編集ボタンで textarea が編集可能状態になる
-  it("shows an editable textarea when the edit button is clicked", () => {
+  // SPEC-001-R3 正常系: 読み込み直後から編集可能な textarea が表示され、編集ボタンは存在しない
+  it("shows an editable textarea from the start with no edit button", () => {
     const pane = createEditorPane(makeOptions());
     const textarea = pane.element.querySelector("textarea") as HTMLTextAreaElement;
-    const editButton = pane.element.querySelector(
-      ".editor-pane__edit-button",
-    ) as HTMLButtonElement;
 
-    expect(textarea.hidden).toBe(true);
-    editButton.click();
+    // 最初から表示・編集可能（hidden でない・readOnly でない）
     expect(textarea.hidden).toBe(false);
+    expect(textarea.readOnly).toBe(false);
     expect(textarea.value).toBe("# 原文");
+    // 編集ボタンは廃止された
+    expect(pane.element.querySelector(".editor-pane__edit-button")).toBeNull();
+    // 保存ボタンは最初から表示されている
+    const saveButton = pane.element.querySelector(
+      ".editor-pane__save-button",
+    ) as HTMLButtonElement;
+    expect(saveButton.hidden).toBe(false);
   });
 
   // SPEC-001-R3 正常系: 入力すると onPreview が変更後テキストで呼ばれる（再プレビュー）
