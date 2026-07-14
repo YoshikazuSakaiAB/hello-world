@@ -1,10 +1,10 @@
 # Markdown Preview 設計書
 
 - 対象仕様: SPEC-001（`specs/markdownpreview.md`）
-- 対象仕様バージョン: 0.6.0
-- 設計バージョン: 0.5.2
+- 対象仕様バージョン: 0.7.2
+- 設計バージョン: 0.6.2
 - ステータス: draft
-- 最終更新: 2026-07-10
+- 最終更新: 2026-07-14
 
 ## 更新履歴
 | バージョン | 日付 | 変更種別 | 変更概要 |
@@ -16,6 +16,9 @@
 | 0.5.0 | 2026-07-10 | 改訂 | 対象仕様を 0.6.0 に更新（レビュー反映）。D&D 受け先をプレビュー画面のドロップ領域に明記、fileSaver の注記表現を仕様に整合、節番号(4.1b→4.2)と 4.8 UI 見出しの仕様No を修正 |
 | 0.5.1 | 2026-07-10 | 改訂 | 再レビュー反映（表記のみ）。方針の参照バージョンを v0.6.0 に、fileValidator のサイズ定数コメントを 5,242,880 バイト表記に更新 |
 | 0.5.2 | 2026-07-10 | 改訂 | 実装追従（表記のみ）。markdownRenderer(4.4) を実装構成に整合：表・打消し線・コードブロックは markdown-it 本体標準対応、タスクリストは markdown-it-task-lists プラグインで対応、DOMPurify の checkbox 許可設定を明記。技術選定表を分割 |
+| 0.6.0 | 2026-07-14 | 改訂 | 対象仕様を 0.7.0 に更新。フロントマターの扱い（R9）を設計。新モジュール frontMatter(4.9) を追加し、js-yaml を技術選定に追加。アーキ図・データフロー・要件対応表・エラー処理表を R9 対応に更新 |
+| 0.6.1 | 2026-07-14 | 改訂 | 対象仕様を 0.7.1 に更新（レビュー反映）。R7 通知文言を「{元コード} から {保存コード} に変換して保存しました」形式に確定し、文字コード表示名（UTF-8/Shift-JIS）は fileLoader の encodingLabel で整形する旨を 4.7 に明記 |
+| 0.6.2 | 2026-07-14 | 改訂 | 対象仕様を 0.7.2 に更新（レビュー反映）。R2 の裸 URL 自動リンク化（markdown-it の linkify: true）を 4.4 に明記 |
 
 ---
 
@@ -40,19 +43,21 @@
   │     ├─ PreviewPage       … プレビュー表示のトップ(R2/R4)
   │     ├─ FileDropZone      … プレビュー画面のドロップ領域・ダイアログでのファイル受け取り(R1)
   │     ├─ EditorPane        … 本文の編集欄・保存ボタン(R3)
+  │     ├─ FrontMatterView   … フロントマターの折りたたみ表示（既定は非表示・展開で表）(R9)
   │     ├─ ErrorBanner       … 対象外ファイル・サイズ超過の通知(R5/R8)
   │     └─ Notice            … 文字コード変更などの情報通知(R7)
   └─ src/lib/                … ドメインロジック(UI非依存・純粋関数優先)
         ├─ fileType          … 拡張子/種別判定(R1/R5)
         ├─ fileValidator     … サイズ上限・空ファイル判定(R8)
         ├─ fileLoader        … File → テキスト読み込み・文字コード判定(R1/R6)
+        ├─ frontMatter       … 先頭 YAML フロントマターの分離・解析(R9)
         ├─ markdownRenderer  … Markdown(CommonMark+GFM) → HTML 変換(R2)
         ├─ diagramRenderer   … Mermaid コードブロックの図描画(R4)
         └─ fileSaver         … 編集内容を UTF-8 テキストとして保存/ダウンロード(R3/R7)
 ```
 
 データフロー（正常系）:
-`FileDropZone`(R1) → `fileType` で種別判定(R1/R5) → `fileValidator` でサイズ判定(R8) → OK なら `fileLoader` で文字コードを判定して読み込み(R1/R6) → `markdownRenderer`(R2)＋`diagramRenderer`(R4) → `PreviewPage` に描画。NG なら `ErrorBanner`(R5/R8)。
+`FileDropZone`(R1) → `fileType` で種別判定(R1/R5) → `fileValidator` でサイズ判定(R8) → OK なら `fileLoader` で文字コードを判定して読み込み(R1/R6) → `frontMatter` で先頭フロントマターを本文と分離(R9) → 本文を `markdownRenderer`(R2)＋`diagramRenderer`(R4) で描画し、フロントマターがあれば `FrontMatterView`(R9) を先頭に配置 → `PreviewPage` に描画。NG なら `ErrorBanner`(R5/R8)。
 編集フロー(R3): `EditorPane` で本文を編集 → `markdownRenderer` で再描画 → 保存時は `fileSaver` が UTF-8 でダウンロードし、元の文字コードと異なれば `Notice` で通知(R7)。
 
 ---
@@ -71,6 +76,7 @@ reviewer が仕様No で追跡できるよう、各要件を担う設計要素�
 | SPEC-001-R6 | UTF-8/Shift-JIS を文字化けなく表示 | `fileLoader` | R6 正常系（UTF-8／Shift-JIS）|
 | SPEC-001-R7 | 文字コード変更時に通知 | `fileSaver`, `EditorPane`, `Notice` | R7 正常系（変わる／変わらない）|
 | SPEC-001-R8 | サイズ上限・空ファイルの扱い | `fileValidator`, `ErrorBanner` | R8 異常系（超過）／準正常系（空）|
+| SPEC-001-R9 | フロントマターを分離し折りたたみ表示 | `frontMatter`, `FrontMatterView`, `PreviewPage` | R9 正常系（既定非表示／展開で表）／準正常系（無し）|
 
 ---
 
@@ -126,7 +132,8 @@ reviewer が仕様No で追跡できるよう、各要件を担う設計要素�
 - 前提: 入力は `fileLoader` でデコード済みの文字列。文字コードの差異はこの層に持ち込まない。
 - パーサ: **markdown-it**（CommonMark 準拠）を採用（SPEC-001 v0.5.0）。GFM 相当の表・打消し線・コードブロックは markdown-it 本体で標準対応する。タスクリスト（`- [ ]` / `- [x]`）のみ本体未対応のため **markdown-it-task-lists** プラグイン（読み取り専用 `enabled: false`）を追加する。
 - タスクリストの `<input type="checkbox">` は DOMPurify のサニタイズで除去されないよう、許可タグ・属性（`input` / `type` / `checked` / `disabled`）に明示追加する。
-- 受入れ条件 R2 正常系: `# 見出し`→`<h1>`、`**太字**`→`<strong>`、`- 箇条書き`→`<ul><li>`。GFM の表・コードブロックも変換する。
+- 裸の URL の自動リンク化（GFM 相当）: markdown-it の `linkify: true` により、本文中の裸の URL（`https://…`）を `<a>` に変換する。明示リンク `[text](url)` は linkify 設定に関わらず常に変換される。
+- 受入れ条件 R2 正常系: `# 見出し`→`<h1>`、`**太字**`→`<strong>`、`- 箇条書き`→`<ul><li>`。GFM の表・コードブロックも変換する。裸 URL は `<a href="…">` にリンク化される。
 - 準正常系: Markdown として解釈できない行はプレーンテキストとしてそのまま出力（markdown-it の既定挙動）。
 - セキュリティ: 変換後 HTML は XSS 対策のため **DOMPurify** でサニタイズする。
 
@@ -158,7 +165,8 @@ reviewer が仕様No で追跡できるよう、各要件を担う設計要素�
   }
   function saveText(filename: string, text: string, sourceEncoding: Encoding): SaveResult
   ```
-- **文字コード変更の判定（R7）**: `sourceEncoding !== savedEncoding` のとき `encodingChanged: true` を返す。呼び出し元（`EditorPane`）はこの結果を見て `Notice` に「UTF-8 で保存しました」等の通知を出す。変わらない場合は通知しない。
+- **文字コード変更の判定（R7）**: `sourceEncoding !== savedEncoding` のとき `encodingChanged: true` を返す。呼び出し元（`EditorPane`）はこの結果を見て `Notice` に通知を出す。変わらない場合は通知しない。
+- **通知文言（R7・確定）**: 「{元の文字コード} から {保存した文字コード} に変換して保存しました」形式とする（例: 「Shift-JIS から UTF-8 に変換して保存しました」）。文字コード名は `fileLoader` の `encodingLabel()` で表示名（`utf-8`→`UTF-8`、`shift_jis`→`Shift-JIS`）に整形する。
 - 実装方針: `Blob`（UTF-8）+ `URL.createObjectURL` + `<a download>` でダウンロードを起動。
 
 ### 4.8 UI コンポーネント（R1/R2/R3/R4/R5/R7/R8）
@@ -167,6 +175,37 @@ reviewer が仕様No で追跡できるよう、各要件を担う設計要素�
 - `EditorPane`（R3）: 編集ボタン・編集欄・保存ボタン。詳細は 4.6。
 - `ErrorBanner`（R5/R8）: 対象外ファイル・サイズ超過のメッセージ表示。プレビュー領域はクリア／未描画のまま。
 - `Notice`（R7）: 保存時の文字コード変更などの通知メッセージを表示。エラーではない情報通知。
+- `FrontMatterView`（R9）: フロントマターの折りたたみ表示。詳細は 4.10。
+
+### 4.9 frontMatter（R9, 優先度 should）
+- 役割: `fileLoader` でデコード済みのテキストから、先頭の YAML フロントマター（`---` で挟まれたブロック）を本文と分離し、メタ情報を key/value に解析する。
+- 前提: フロントマターは**ファイル先頭**にあり、`---`（行頭）で開始し、次の `---` または `...`（行頭）で終了する（一般的な YAML フロントマターの規約）。先頭にない `---` は本文の区切り線として扱い、分離しない。
+- 複数行のブロック値（例: `style: |`）を正しく解析するため、YAML パーサ **js-yaml** を用いる。
+- インターフェース（案）:
+  ```ts
+  interface FrontMatterEntry {
+    key: string
+    value: string   // 表示用に文字列化した値（オブジェクト/配列は JSON 文字列などに整形）
+  }
+  interface ParsedMarkdown {
+    entries: FrontMatterEntry[]  // フロントマターが無ければ空配列
+    body: string                 // フロントマターを除いた本文（markdownRenderer に渡す）
+  }
+  function parseFrontMatter(source: string): ParsedMarkdown
+  ```
+- 処理手順:
+  1. 先頭が `---`（行頭）で始まるか判定。始まらなければ `entries: []`, `body: source` を返す（準正常系: フロントマター無し）。
+  2. 次の終了区切り（`---` または `...`）までを YAML ブロックとして取り出し、残りを `body` とする。
+  3. YAML ブロックを js-yaml でパースし、トップレベルの key/value を `entries` に展開する。値がオブジェクト/配列/複数行文字列の場合は表示用に文字列化する。
+  4. YAML として解釈できない場合はフロントマター無しとして扱う（本文全体を `body` にし、エラーにしない）。堅牢性を優先。
+- 本文（`body`）は従来どおり `markdownRenderer`(R2) に渡す。フロントマター分離はこの層で完結し、`markdownRenderer` は関与しない。
+
+### 4.10 FrontMatterView（R9, 優先度 should）
+- 役割: `parseFrontMatter` の `entries` を、折りたたみ（`<details>`/`<summary>`）内に key/value の表（`<table>`）として描画する。
+- 振る舞い:
+  - `entries` が空（フロントマター無し）の場合は**何も描画しない**（準正常系: 折りたたみ自体を出さない）。
+  - `entries` があれば `<details>`（既定は閉じ＝非表示）を生成し、`<summary>` に「フロントマター」等のラベル、内部に key/value の `<table>` を置く（R9 正常系: 既定非表示／展開で表）。
+- 配置: `PreviewPage` が本文プレビューの**先頭**に `FrontMatterView` を差し込む。
 
 ---
 
@@ -187,6 +226,7 @@ reviewer が仕様No で追跡できるよう、各要件を担う設計要素�
 | Markdown 未解釈行 | プレーンテキストとして表示、エラーにしない | R2 |
 | Mermaid 構文エラー（R4） | 該当ブロックのみ失敗扱い、他のプレビューは継続 | R4 |
 | 保存時に文字コードが変わる（例: Shift-JIS→UTF-8） | エラーではなく `Notice` で保存文字コードを通知 | R7 |
+| フロントマターが YAML として解釈できない | フロントマター無しとして扱い本文全体を表示、エラーにしない | R9 |
 
 ---
 
@@ -196,7 +236,8 @@ reviewer が仕様No で追跡できるよう、各要件を担う設計要素�
 - `fileSaver` は本文＋encoding を渡したとき、意図した内容・文字コードの Blob が生成されること、および元と異なる場合に `encodingChanged: true` を返すことをテストする（R3/R7）。
 - `fileValidator` はサイズ超過・空ファイルの判定結果をテストする（R8）。
 - `diagramRenderer` は正常な Mermaid が描画され、構文エラー時に他のプレビューが継続することをテストする（R4）。
-- `src/components/` は `__tests__/components/` で D&D・ダイアログ・エラー表示・通知の振る舞いをテスト。
+- `frontMatter` は「先頭フロントマターを分離して body と entries に分ける」「複数行ブロック値（`style: |`）を解析できる」「フロントマター無し・不正 YAML では body 全体を返す」ことをテストする（R9）。
+- `src/components/` は `__tests__/components/` で D&D・ダイアログ・エラー表示・通知・フロントマター折りたたみ（既定非表示／展開で表）の振る舞いをテスト。
 - 各テストに対応する仕様No をコメントで紐づける（`claude.md` のコメント規約準拠）。
 
 ---
@@ -210,6 +251,7 @@ SPEC-001 v0.5.0 の決定に基づき確定。バージョンは実装時に最�
 | タスクリスト | markdown-it-task-lists | R2 | `- [ ]` / `- [x]` をチェックボックス化（読み取り専用）|
 | HTML サニタイズ | DOMPurify | R2 | XSS 対策 |
 | 文字コード判定 | encoding-japanese | R6 | UTF-8/Shift-JIS を判定。不能時 UTF-8 |
+| フロントマター解析 | js-yaml | R9 | 先頭 YAML を key/value に解析。複数行ブロック値に対応 |
 | 図の描画 | Mermaid | R4 | クライアント描画のみ |
 | 言語/ビルド | TypeScript（＋バンドラ） | 全体 | Manifest V3・拡張機能としてパッケージ |
 

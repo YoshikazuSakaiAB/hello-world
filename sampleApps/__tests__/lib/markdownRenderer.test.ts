@@ -35,6 +35,12 @@ describe("renderMarkdown (SPEC-001-R2)", () => {
     expect(html).toMatch(/checked/);
   });
 
+  // SPEC-001-R2: 裸の URL は自動リンク化される（GFM 相当・linkify）
+  it("auto-links a bare URL", () => {
+    const html = renderMarkdown("詳しくは https://example.com を参照");
+    expect(html).toContain('<a href="https://example.com">');
+  });
+
   // SPEC-001-R2 準正常系: 解釈できない行はプレーンテキストとして残る（エラーにならない）
   it("keeps non-markdown text as plain text without error", () => {
     const html = renderMarkdown("これは普通の文章です。");
