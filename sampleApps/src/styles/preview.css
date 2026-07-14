@@ -36,6 +36,73 @@ body {
   color: #c5221f;
 }
 
+/* SPEC-001-R7: 情報通知（エラーではない） */
+.notice {
+  margin: 1rem 0;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  background: #e6f4ea;
+  color: #137333;
+}
+
+/* SPEC-001-R3: 編集ペイン */
+.preview-page__editor {
+  margin: 1rem 0;
+}
+.editor-pane__edit-button,
+.editor-pane__save-button {
+  padding: 0.4rem 1rem;
+  margin-right: 0.5rem;
+  border: 1px solid #1a73e8;
+  border-radius: 6px;
+  background: #1a73e8;
+  color: #fff;
+  cursor: pointer;
+}
+.editor-pane__textarea {
+  display: block;
+  width: 100%;
+  min-height: 12rem;
+  margin: 0.5rem 0;
+  padding: 0.5rem;
+  font-family: ui-monospace, monospace;
+  font-size: 0.95rem;
+  box-sizing: border-box;
+}
+
+/* SPEC-001-R9: フロントマターの折りたたみ */
+.front-matter {
+  margin-bottom: 1rem;
+  border: 1px solid #dadce0;
+  border-radius: 6px;
+  background: #f8f9fa;
+}
+.front-matter__summary {
+  cursor: pointer;
+  padding: 0.5rem 0.75rem;
+  color: #5f6368;
+  user-select: none;
+}
+.front-matter__table {
+  border-collapse: collapse;
+  margin: 0 0.75rem 0.75rem;
+}
+.front-matter__table th,
+.front-matter__table td {
+  border: 1px solid #dadce0;
+  padding: 0.25rem 0.5rem;
+  text-align: left;
+  vertical-align: top;
+}
+.front-matter__table th {
+  background: #eef1f4;
+  white-space: nowrap;
+}
+/* 複数行の値（style: | など）は改行を保持して表示する */
+.front-matter__table td {
+  white-space: pre-wrap;
+}
+
 /* SPEC-001-R2: プレビュー表示領域 */
 .preview-page__content {
   margin-top: 1rem;

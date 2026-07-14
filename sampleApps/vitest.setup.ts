@@ -14,4 +14,17 @@ if (typeof Blob !== "undefined" && typeof Blob.prototype.text !== "function") {
   };
 }
 
+// jsdom は Blob/File.prototype.arrayBuffer() も未実装のことがあるためポリフィルする。
+// （fileLoader が file.arrayBuffer() を利用する。本番のブラウザでは標準実装）
+if (typeof Blob !== "undefined" && typeof Blob.prototype.arrayBuffer !== "function") {
+  Blob.prototype.arrayBuffer = function (this: Blob): Promise<ArrayBuffer> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as ArrayBuffer);
+      reader.onerror = () => reject(reader.error);
+      reader.readAsArrayBuffer(this);
+    });
+  };
+}
+
 export {};
